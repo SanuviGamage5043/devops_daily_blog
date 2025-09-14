@@ -22,3 +22,14 @@ services:
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
+
+  mongodb:
+    image: mongo:7.0
+    container_name: blog-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
