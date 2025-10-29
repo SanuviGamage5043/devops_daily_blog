@@ -7,14 +7,19 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Routes
-app.use("/api", userRoutes);
+// Root route for testing
+app.get("/", (req, res) => {
+  res.send("Backend connected");
+});
+
+// API routes
+app.use("/users", userRoutes);
 
 // MongoDB connection
 const mongoURI = "mongodb://blog-mongo:27017/blogDB"; // container MongoDB
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoURI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error(err));
 
 const PORT = 5000;
-app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Backend running on port ${PORT}`));

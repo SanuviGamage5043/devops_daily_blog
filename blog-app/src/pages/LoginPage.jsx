@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const navigate = useNavigate(); // to redirect after login
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,7 +15,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/login", {
+      const res = await fetch("http://localhost:5000/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -27,9 +27,9 @@ export default function LoginPage() {
         setError(data.error || "Login failed");
       } else {
         console.log("Login successful:", data.user);
-        // you can store user in localStorage if needed
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/"); // redirect to homepage or dashboard
+
+        // Navigate directly to /home
+        navigate("/home");
       }
     } catch {
       setError("Something went wrong. Please try again.");

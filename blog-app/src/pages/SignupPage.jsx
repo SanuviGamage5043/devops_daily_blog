@@ -25,7 +25,7 @@ export default function SignupPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/users", {
+      const res = await fetch("http://localhost:5000/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -41,7 +41,11 @@ export default function SignupPage() {
         setError(data.error || "Signup failed");
       } else {
         console.log("Signup successful:", data);
-        navigate("/"); // redirect to login page
+        console.log("Name:", data.user.name);
+        console.log("Email:", data.user.email);
+
+        // Navigate directly to /home
+        navigate("/");
       }
     } catch {
       setError("Something went wrong. Please try again.");
