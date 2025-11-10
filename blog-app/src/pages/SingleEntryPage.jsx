@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 // Mock data for a single entry
 const mockEntry = {

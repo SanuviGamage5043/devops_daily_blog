@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import NavBar from '../components/NavBar.jsx'; // ✅ Import NavBar component
+import { useState } from 'react';
+import NavBar from '../components/NavBar.jsx'; 
 
 // Mock data for journal entries
 const mockEntries = [
