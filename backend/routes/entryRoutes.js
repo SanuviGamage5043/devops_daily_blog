@@ -5,12 +5,17 @@ import {
   deleteEntry,
 } from "../controllers/entryController.js";
 import { upload } from "../middleware/uploadMiddleware.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js"; // JWT auth
 
 const router = express.Router();
 
+// Create new entry with optional files
 router.post("/", protect, upload.array("files", 10), createEntry);
-router.get("/user/:userId", protect, getEntriesByUser);
+
+// Get entries for logged-in user
+router.get("/user", protect, getEntriesByUser);
+
+// Delete entry by ID
 router.delete("/:id", protect, deleteEntry);
 
 export default router;

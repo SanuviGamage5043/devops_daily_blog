@@ -15,7 +15,7 @@ const AllEntriesPage = () => {
     const fetchEntries = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/entries/user/${userId}`, {
+        const res = await axios.get(`http://localhost:5000/entries/user`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setEntries(res.data);

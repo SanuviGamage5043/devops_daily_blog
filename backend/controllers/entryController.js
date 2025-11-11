@@ -9,12 +9,12 @@ export const createEntry = async (req, res) => {
   try {
     const { title, mood, content, tags } = req.body;
 
-    const userId = req.user.userId; // ✅ always from JWT
+    const userId = req.user.id; // ✅ from JWT middleware
 
     const uploadedFiles = req.files ? req.files.map((file) => file.filename) : [];
 
     const entry = new Entry({
-      userId,
+      user: userId, // store user reference
       title,
       mood,
       content,
@@ -31,18 +31,18 @@ export const createEntry = async (req, res) => {
 };
 
 /**
- * READ all entries for a user
+ * READ all entries for the logged-in user
  */
 export const getEntriesByUser = async (req, res) => {
   try {
-    const userIdFromJWT = req.user.userId;
+    const userIdFromJWT = req.user.id;
 
-    // Ensure requested user matches JWT
-    if (req.params.userId !== userIdFromJWT) {
+    // Optionally: check if requested userId matches JWT (for /user/:userId route)
+    if (req.params.userId && req.params.userId !== userIdFromJWT) {
       return res.status(403).json({ message: "Unauthorized access" });
     }
 
-    const entries = await Entry.find({ userId: userIdFromJWT }).sort({ createdAt: -1 });
+    const entries = await Entry.find({ user: userIdFromJWT }).sort({ createdAt: -1 });
     res.json(entries);
   } catch (err) {
     console.error("Error fetching entries:", err);
@@ -58,11 +58,11 @@ export const deleteEntry = async (req, res) => {
     const entry = await Entry.findById(req.params.id);
     if (!entry) return res.status(404).json({ message: "Entry not found" });
 
-    if (entry.userId !== req.user.userId) {
+    if (entry.user.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized access" });
     }
 
-    // Delete files
+    // Delete uploaded files
     entry.files.forEach((filename) => {
       const filePath = path.join("uploads", filename);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
