@@ -1,7 +1,9 @@
-
 import NavBar from "../components/NavBar.jsx";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
   // Mock data
   const stats = [
     { label: "Total Entries", value: "1", icon: "📝" },
@@ -10,10 +12,10 @@ const HomePage = () => {
   ];
 
   const actions = [
-    { label: "New Entry", icon: "➕", primary: true },
-    { label: "All Entries", icon: "📖" },
-    { label: "Mood Trends", icon: "📈" },
-    { label: "Settings", icon: "⚙️" },
+    { label: "New Entry", icon: "➕", primary: true, path: "/add-entry" },
+    { label: "All Entries", icon: "📖", path: "/entries" },
+    { label: "Mood Trends", icon: "📈", path: "/analytics" },
+    { label: "Settings", icon: "⚙️", path: "/settings" },
   ];
 
   const recentEntry = {
@@ -46,9 +48,7 @@ const HomePage = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-md text-gray-500">{stat.label}</p>
-                  <p className="text-3xl font-extrabold text-gray-900 mt-1">
-                    {stat.value}
-                  </p>
+                  <p className="text-3xl font-extrabold text-gray-900 mt-1">{stat.value}</p>
                 </div>
                 <span className="text-2xl">{stat.icon}</span>
               </div>
@@ -61,6 +61,7 @@ const HomePage = () => {
           {actions.map((action, index) => (
             <button
               key={index}
+              onClick={() => navigate(action.path)} // Navigate on click
               className={`flex flex-col items-center justify-center p-4 rounded-xl text-center shadow-md transition duration-200 ease-in-out ${
                 action.primary
                   ? "bg-indigo-600 hover:bg-indigo-700 text-white col-span-2 sm:col-span-1"
@@ -69,17 +70,11 @@ const HomePage = () => {
               style={action.primary ? { minHeight: "100px" } : {}}
             >
               <span
-                className={`text-2xl mb-1 ${
-                  action.primary ? "text-white" : "text-gray-600"
-                }`}
+                className={`text-2xl mb-1 ${action.primary ? "text-white" : "text-gray-600"}`}
               >
                 {action.icon}
               </span>
-              <span
-                className={`font-semibold ${
-                  action.primary ? "text-white" : "text-gray-800"
-                }`}
-              >
+              <span className={`font-semibold ${action.primary ? "text-white" : "text-gray-800"}`}>
                 {action.label}
               </span>
             </button>
@@ -87,16 +82,12 @@ const HomePage = () => {
         </div>
 
         {/* Recent Entries Section */}
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">
-          Recent Entries
-        </h3>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Entries</h3>
 
         {/* Single Recent Entry Card */}
         <div className="bg-white p-5 rounded-xl border-l-4 border-yellow-500 shadow-md flex justify-between items-start hover:shadow-lg transition duration-200">
           <div>
-            <h4 className="text-lg font-bold text-gray-900">
-              {recentEntry.title}
-            </h4>
+            <h4 className="text-lg font-bold text-gray-900">{recentEntry.title}</h4>
             <p className="text-gray-600 my-1">{recentEntry.content}</p>
             <p className="text-sm text-gray-400">{recentEntry.date}</p>
           </div>

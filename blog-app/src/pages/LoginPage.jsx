@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,24 +16,25 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const res = await axios.post("http://localhost:5000/users/login", formData);
+      const data = res.data;
 
-      const data = await res.json();
+      console.log("Login successful:", data.user);
 
-      if (!res.ok) {
-        setError(data.error || "Login failed");
-      } else {
-        console.log("Login successful:", data.user);
+      // Save token and userId in localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.user.id);
 
-        // Navigate directly to /home
-        navigate("/home");
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
+      // Navigate to entries/dashboard
+      navigate("/home");
+    } catch (err) {
+      console.error("Login failed:", err);
+
+      // Show error message
+      setError(err.response?.data?.message || "Login failed. Please try again.");
+
+      // Redirect to login page after 2 seconds
+      setTimeout(() => navigate("/"), 2000);
     }
   };
 

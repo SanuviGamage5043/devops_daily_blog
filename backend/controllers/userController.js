@@ -1,42 +1,27 @@
-// controllers/userController.js
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validatePassword } from "../utils/validatePassword.js";
 
-// Generate JWT
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET || "yourSecretKey", {
     expiresIn: "7d",
   });
 };
 
-// Signup - create user
+// Signup
 export const createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
-    // Validate password rules
     const passwordError = validatePassword(password);
-    if (passwordError) {
-      return res.status(400).json({ error: passwordError });
-    }
+    if (passwordError) return res.status(400).json({ error: passwordError });
 
-    // Check if user exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already registered" });
-    }
+    if (existingUser) return res.status(400).json({ error: "Email already registered" });
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
+    const newUser = await User.create({ name, email, password: hashedPassword });
     const token = generateToken(newUser._id);
 
     res.status(201).json({
@@ -61,22 +46,7 @@ export const loginUser = async (req, res) => {
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = generateToken(user._id);
-
-    res.json({
-      message: "Login successful",
-      user: { id: user._id, name: user.name, email: user.email },
-      token,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Get all users (protected route)
-export const getUsers = async (req, res) => {
-  try {
-    const users = await User.find().select("-password");
-    res.json(users);
+    res.json({ message: "Login successful", user: { id: user._id, name: user.name, email: user.email }, token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
