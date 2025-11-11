@@ -3,6 +3,7 @@ import {
   createEntry,
   getEntriesByUser,
   deleteEntry,
+  updateEntry
 } from "../controllers/entryController.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 import { protect } from "../middleware/authMiddleware.js"; // JWT auth
