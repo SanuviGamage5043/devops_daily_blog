@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 
 const NavBar = () => {
   const navItems = [
-    { name: "Dashboard", path: "/" },
+    { name: "Dashboard", path: "/home" },
     { name: "Entries", path: "/entries" },
     { name: "Analytics", path: "/analytics" },
     { name: "Export", path: "/export" },
@@ -19,7 +19,7 @@ const NavBar = () => {
           {/* Left: Logo */}
           <div className="flex items-center space-x-2">
             <Link
-              to="/"
+              to="/home"
               className="flex items-center space-x-2 text-2xl font-bold text-indigo-600"
             >
               <svg
@@ -66,7 +66,7 @@ const NavBar = () => {
               <span className="font-medium text-gray-800">{userName}</span>
             </span>
             <Link
-              to="/login"
+              to="/"
               className="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800"
             >
               <svg

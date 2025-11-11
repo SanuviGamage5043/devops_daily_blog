@@ -1,55 +1,57 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-
-// --- Mock Data ---
-const mockEntryData = {
-  id: 42,
-  title: 'Mindful Morning Walk & Reflection',
-  mood: 'happy',
-  content:
-    "Today started with a wonderful, crisp morning walk. I focused on mindful breathing and observing the changing colors of the autumn leaves. It truly helped set a positive tone for the entire day.",
-  tags: 'personal, reflection, goals',
-  existingAttachments: [
-    { id: 101, name: 'Autumn-Photo-1.jpg', size: '1.2 MB', type: 'image' },
-    { id: 102, name: 'Meeting-Notes.pdf', size: '200 KB', type: 'document' },
-  ],
-};
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const moods = [
-  { label: 'Neutral', emoji: '😐', value: 'neutral' },
-  { label: 'Happy', emoji: '😀', value: 'happy' },
-  { label: 'Sad', emoji: '😔', value: 'sad' },
-  { label: 'Excited', emoji: '🤩', value: 'excited' },
-  { label: 'Tired', emoji: '😴', value: 'tired' },
+  { label: "Neutral", emoji: "😐", value: "neutral" },
+  { label: "Happy", emoji: "😀", value: "happy" },
+  { label: "Sad", emoji: "😔", value: "sad" },
+  { label: "Excited", emoji: "🤩", value: "excited" },
+  { label: "Tired", emoji: "😴", value: "tired" },
 ];
 
 const EditEntryPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   const [formState, setFormState] = useState({
-    title: '',
-    mood: 'neutral',
-    content: '',
-    tags: '',
+    title: "",
+    mood: "neutral",
+    content: "",
+    tags: "",
   });
+
   const [existingAttachments, setExistingAttachments] = useState([]);
-  const [newFiles, setNewFiles] = useState(null);
+  const [newFiles, setNewFiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- Simulate Data Fetch ---
+  // --- Fetch entry from API ---
   useEffect(() => {
-    console.log(`Fetching entry data for ID: ${id}`);
-    setTimeout(() => {
-      setFormState({
-        title: mockEntryData.title,
-        mood: mockEntryData.mood,
-        content: mockEntryData.content,
-        tags: mockEntryData.tags,
-      });
-      setExistingAttachments(mockEntryData.existingAttachments);
-      setLoading(false);
-    }, 500);
-  }, [id]);
+    const fetchEntry = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`http://localhost:5000/entries/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const entry = res.data;
+        setFormState({
+          title: entry.title,
+          mood: entry.mood,
+          content: entry.content,
+          tags: entry.tags,
+        });
+        setExistingAttachments(entry.attachments || []);
+      } catch (err) {
+        console.error("Error fetching entry:", err);
+        alert("Failed to load entry");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEntry();
+  }, [id, token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,28 +59,46 @@ const EditEntryPage = () => {
   };
 
   const handleFileChange = (e) => {
-    setNewFiles(e.target.files);
+    setNewFiles(Array.from(e.target.files));
   };
 
   const handleRemoveAttachment = (attachmentId) => {
-    if (window.confirm('Are you sure you want to remove this attachment?')) {
+    if (window.confirm("Are you sure you want to remove this attachment?")) {
       setExistingAttachments((prev) =>
         prev.filter((att) => att.id !== attachmentId)
       );
-      console.log(`Attachment ${attachmentId} removed.`);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Updated Entry:', formState);
-    console.log('Files to upload:', newFiles);
-    alert('Changes Saved!');
+
+    try {
+      const formData = new FormData();
+      formData.append("title", formState.title);
+      formData.append("mood", formState.mood);
+      formData.append("content", formState.content);
+      formData.append("tags", formState.tags);
+
+      newFiles.forEach((file) => formData.append("files", file));
+
+      // Update entry via API
+      await axios.put(`http://localhost:5000/entries/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert("Entry updated successfully!");
+      navigate("/entries");
+    } catch (err) {
+      console.error("Error updating entry:", err);
+      alert("Failed to update entry");
+    }
   };
 
-  const handleCancel = () => {
-    alert(`Redirecting back to /entry/${id}`);
-  };
+  const handleCancel = () => navigate(-1);
 
   const currentMood = moods.find((m) => m.value === formState.mood);
 
@@ -92,44 +112,11 @@ const EditEntryPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* --- NavBar --- */}
       <header className="bg-white border-b border-gray-200 p-4 shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          {/* App Name */}
           <div className="flex items-center space-x-2 text-indigo-600 font-semibold text-xl">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6.253v13m0-13C10.832 5.415 9.497 5 8 5c-4 0-4 4-4 4s-.5 2 4 2c4 0 4-4 4-4zM12 6.253c1.168.832 2.503 1.25 4 1.25 4 0 4-4 4-4s.5-2-4-2c-4 0-4 4-4 4z"
-              />
-            </svg>
-            <span>My Journal</span>
+            My Journal
           </div>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex space-x-6 text-gray-600 text-sm font-medium">
-            <a href="/dashboard" className="hover:text-indigo-600">
-              Home
-            </a>
-            <a href="/entries" className="hover:text-indigo-600">
-              All Entries
-            </a>
-            <a href="/add-entry" className="hover:text-indigo-600">
-              Add Entry
-            </a>
-            <a href="/analytics" className="hover:text-indigo-600">
-              Mood Trends
-            </a>
-          </nav>
-
-          {/* User Info */}
           <div className="text-sm text-gray-600">
             Welcome, <span className="font-medium text-gray-800">John</span> |
             <button className="text-indigo-600 hover:text-indigo-800 font-medium ml-1">
@@ -139,7 +126,6 @@ const EditEntryPage = () => {
         </div>
       </header>
 
-      {/* --- Edit Form --- */}
       <div className="max-w-2xl mx-auto bg-white mt-10 p-8 rounded-xl shadow-lg border border-gray-200">
         <h1 className="text-3xl font-serif font-bold text-gray-800 mb-8">
           Edit Journal Entry
@@ -218,22 +204,6 @@ const EditEntryPage = () => {
                       onClick={() => handleRemoveAttachment(att.id)}
                       className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center"
                     >
-                      <svg
-                        className="w-4 h-4 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5
-                          4v6m4-6v6m1-10V4a1 1 0
-                          00-1-1h-4a1 1 0
-                          00-1 1v3M4 7h16"
-                        />
-                      </svg>
                       Remove
                     </button>
                   </li>

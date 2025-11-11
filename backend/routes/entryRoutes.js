@@ -15,6 +15,9 @@ router.post("/", protect, upload.array("files", 10), createEntry);
 // Get entries for logged-in user
 router.get("/user", protect, getEntriesByUser);
 
+// Update entry by ID with optional new files
+router.put("/:id", protect, upload.array("files", 10), updateEntry);
+
 // Delete entry by ID
 router.delete("/:id", protect, deleteEntry);
 

@@ -49,6 +49,51 @@ export const getEntriesByUser = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch entries" });
   }
 };
+//update entry
+export const updateEntry = async (req, res) => {
+  try {
+    const entryId = req.params.id;
+    const { title, mood, content, tags, removedFiles } = req.body;
+    const userId = req.user.id;
+
+    const entry = await Entry.findById(entryId);
+    if (!entry) return res.status(404).json({ message: "Entry not found" });
+
+    if (entry.user.toString() !== userId) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    // Update basic fields
+    if (title) entry.title = title;
+    if (mood) entry.mood = mood;
+    if (content) entry.content = content;
+    if (tags) entry.tags = tags.split(",").map((t) => t.trim());
+
+    // Remove files if requested
+    if (removedFiles && Array.isArray(removedFiles)) {
+      removedFiles.forEach((filename) => {
+        const index = entry.files.indexOf(filename);
+        if (index > -1) {
+          const filePath = path.join("uploads", filename);
+          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+          entry.files.splice(index, 1);
+        }
+      });
+    }
+
+    // Add new uploaded files
+    if (req.files && req.files.length > 0) {
+      const uploadedFiles = req.files.map((f) => f.filename);
+      entry.files.push(...uploadedFiles);
+    }
+
+    const updatedEntry = await entry.save();
+    res.json(updatedEntry);
+  } catch (err) {
+    console.error("Error updating entry:", err);
+    res.status(500).json({ message: "Failed to update entry" });
+  }
+};
 
 /**
  * DELETE entry
