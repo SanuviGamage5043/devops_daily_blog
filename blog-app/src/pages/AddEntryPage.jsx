@@ -63,7 +63,7 @@ const AddEntryPage = () => {
       <NavBar />
       <div className="flex items-start justify-center pt-10 pb-10 px-4">
         <div className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
-          <h1 className="text-3xl font-serif font-bold text-gray-800 mb-8">New Journal Entry</h1>
+          <h1 className="text-3xl font-serif font-bold text-gray-900 mb-8">New Journal Entry</h1>
           {message && <div className={`mb-4 text-center font-medium ${message.startsWith("✅") ? "text-green-600" : "text-red-600"}`}>{message}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
