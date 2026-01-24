@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "eu-north-1"
+  region = "ap-south-1"
 }
 
 resource "null_resource" "deploy_blogapp" {
@@ -24,8 +24,8 @@ resource "null_resource" "deploy_blogapp" {
     connection {
       type        = "ssh"
       user        = "ubuntu"                                 # EC2 default user
-      private_key = file("/home/Sanuvi/Downloads/NewKey.pem")
-      host        = "13.205.15.230"                            # EC2 public IP
+      private_key = file("/home/Sanuvi/Downloads/NewDevopsKey.pem")
+      host        = "13.201.124.143"                            # EC2 public IP
     }
   }
 }
