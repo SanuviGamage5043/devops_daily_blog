@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_USER = credentials('dockerhub-creds') // Docker Hub credentials
-        AWS_KEY     = credentials('aws-access-key')   // Optional: AWS creds if Terraform needs them
+        AWS_KEY     = credentials('aws-access-key')   // AWS credentials for Terraform
         AWS_SECRET  = credentials('aws-secret-key')
     }
 
@@ -15,30 +15,26 @@ pipeline {
             }
         }
 
+        // Terraform stages
         stage('Terraform Init') {
             steps {
-                dir('devops_daily_blog') { // make sure to go to the Terraform folder
-                    sh 'terraform init'
-                }
+                sh 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                dir('devops_daily_blog') {
-                    sh 'terraform plan -out=tfplan'
-                }
+                sh 'terraform plan -out=tfplan'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                dir('devops_daily_blog') {
-                    sh 'terraform apply -auto-approve tfplan'
-                }
+                sh 'terraform apply -auto-approve tfplan'
             }
         }
 
+        // Docker stages
         stage('Build Docker Images') {
             steps {
                 sh 'chmod +x ./scripts/build.sh'
