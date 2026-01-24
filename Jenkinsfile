@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         DOCKER_USER = credentials('dockerhub-creds') // Docker Hub credentials
-        AWS_KEY     = credentials('aws-access-key')   // Optional: AWS creds if Terraform needs them
-        AWS_SECRET  = credentials('aws-secret-key')
     }
 
     stages {
@@ -17,8 +15,14 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                dir('devops_daily_blog') { // make sure to go to the Terraform folder
-                    sh 'terraform init'
+                dir('devops_daily_blog') {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'aws-cred', 
+                        usernameVariable: 'AWS_ACCESS_KEY_ID', 
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )]) {
+                        sh 'terraform init'
+                    }
                 }
             }
         }
@@ -26,7 +30,13 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 dir('devops_daily_blog') {
-                    sh 'terraform plan -out=tfplan'
+                    withCredentials([usernamePassword(
+                        credentialsId: 'aws-cred', 
+                        usernameVariable: 'AWS_ACCESS_KEY_ID', 
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )]) {
+                        sh 'terraform plan -out=tfplan'
+                    }
                 }
             }
         }
@@ -34,7 +44,13 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('devops_daily_blog') {
-                    sh 'terraform apply -auto-approve tfplan'
+                    withCredentials([usernamePassword(
+                        credentialsId: 'aws-cred', 
+                        usernameVariable: 'AWS_ACCESS_KEY_ID', 
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )]) {
+                        sh 'terraform apply -auto-approve tfplan'
+                    }
                 }
             }
         }
