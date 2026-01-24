@@ -49,10 +49,14 @@ pipeline {
             }
         }
 
-        stage('Deploy Containers') {
+        // Ansible deployment stage
+        stage('Ansible Deploy') {
             steps {
-                sh 'chmod +x ./scripts/deploy.sh'
-                sh './scripts/deploy.sh'
+                // Install ansible if not installed
+                sh 'sudo apt-get update && sudo apt-get install -y ansible'
+                
+                // Run the playbook
+                sh 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml'
             }
         }
     }

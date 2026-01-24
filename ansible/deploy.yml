@@ -1,0 +1,6 @@
+---
+- name: Deploy Blog App
+  hosts: webservers
+  become: yes
+  roles:
+    - blogapp

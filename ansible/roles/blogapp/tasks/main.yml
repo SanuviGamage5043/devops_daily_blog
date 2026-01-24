@@ -1,0 +1,36 @@
+---
+- name: Stop old containers
+  docker_container:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - blogapp_front
+    - blogapp_back
+    - blogapp_db
+
+- name: Run MongoDB container
+  docker_container:
+    name: blogapp_db
+    image: mongo:7.0
+    state: started
+    restart_policy: always
+    published_ports:
+      - "27017:27017"
+
+- name: Run backend container
+  docker_container:
+    name: blogapp_back
+    image: sanuvi5043/blogapp-backend:latest
+    state: started
+    restart_policy: always
+    published_ports:
+      - "5000:5000"
+
+- name: Run frontend container
+  docker_container:
+    name: blogapp_front
+    image: sanuvi5043/blogapp-frontend:latest
+    state: started
+    restart_policy: always
+    published_ports:
+      - "3000:3000"
