@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         DOCKER_USER = credentials('dockerhub-creds') // Docker Hub credentials
+        AWS_KEY     = credentials('aws-access-key')   // Optional: AWS creds if Terraform needs them
+        AWS_SECRET  = credentials('aws-secret-key')
     }
 
     stages {
@@ -10,6 +12,30 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/SanuviGamage5043/devops_daily_blog.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir('devops_daily_blog') { // make sure to go to the Terraform folder
+                    sh 'terraform init'
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir('devops_daily_blog') {
+                    sh 'terraform plan -out=tfplan'
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir('devops_daily_blog') {
+                    sh 'terraform apply -auto-approve tfplan'
+                }
             }
         }
 
