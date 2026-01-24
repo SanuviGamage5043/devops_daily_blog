@@ -24,7 +24,7 @@ resource "null_resource" "deploy_blogapp" {
     connection {
       type        = "ssh"
       user        = "ubuntu"                                 # EC2 default user
-      private_key = file("/home/ubuntu/Documents/NewDevopsKey.pem")
+      private_key = file("/var/lib/jenkins/.ssh/NewDevopsKey.pem")
       host        = "13.201.124.143"                            # EC2 public IP
     }
   }
