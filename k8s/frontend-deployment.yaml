@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blogapp-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blogapp-frontend
+  template:
+    metadata:
+      labels:
+        app: blogapp-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: sanuvi5043/blogapp-frontend:latest
+          ports:
+            - containerPort: 3000

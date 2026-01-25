@@ -5,6 +5,7 @@ pipeline {
         DOCKER_USER = credentials('dockerhub-creds') // Docker Hub credentials
         AWS_KEY     = credentials('aws-access-key')   // AWS credentials for Terraform
         AWS_SECRET  = credentials('aws-secret-key')
+        KUBECONFIG  = '/home/ubuntu/.kube/config'     // Path to kubeconfig
     }
 
     stages {
@@ -52,14 +53,22 @@ pipeline {
         // Ansible deployment stage
         stage('Ansible Deploy') {
             steps {
-                // Install ansible if not installed
                 sh 'sudo apt-get update && sudo apt-get install -y ansible'
-                
-                // Run the playbook
                 sh 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml'
             }
         }
-    }
+
+        // Kubernetes deployment stage
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/backend-deployment.yaml
+                kubectl apply -f k8s/backend-service.yaml
+                kubectl apply -f k8s/frontend-deployment.yaml
+                kubectl apply -f k8s/frontend-service.yaml
+                '''
+            }
+        }
 
     post {
         success {

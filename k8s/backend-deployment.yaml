@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blogapp-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blogapp-backend
+  template:
+    metadata:
+      labels:
+        app: blogapp-backend
+    spec:
+      containers:
+        - name: backend
+          image: sanuvi5043/blogapp-backend:latest
+          ports:
+            - containerPort: 5000
