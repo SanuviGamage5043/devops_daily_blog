@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USER = credentials('dockerhub-creds')   // Docker Hub username/password
-        AWS_KEY     = credentials('aws-access-key')    // AWS credentials for Terraform
+        DOCKER_USER = credentials('dockerhub-creds')   
+        AWS_KEY     = credentials('aws-access-key')    
         AWS_SECRET  = credentials('aws-secret-key')
         KUBECONFIG  = '/var/lib/jenkins/.kube/config'
         ANSIBLE_KEY = '/var/lib/jenkins/.ssh/NewDevopsKey.pem'
@@ -65,10 +65,10 @@ pipeline {
         // Ansible deployment stage
         stage('Ansible Deploy') {
             steps {
-                // Make sure ansible is installed
+                
                 sh 'sudo apt-get update && sudo apt-get install -y ansible'
 
-                // Use correct inventory path and SSH key
+                
                 dir("${WORKSPACE}") {
                     sh """
                     ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
