@@ -5,7 +5,7 @@ pipeline {
         DOCKER_USER = credentials('dockerhub-creds') // Docker Hub credentials
         AWS_KEY     = credentials('aws-access-key')   // AWS credentials for Terraform
         AWS_SECRET  = credentials('aws-secret-key')
-        KUBECONFIG = "/var/lib/jenkins/.minikube/config"
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
     
     }
 
@@ -67,6 +67,15 @@ pipeline {
                 kubectl apply -f k8s/backend-service.yaml
                 kubectl apply -f k8s/frontend-deployment.yaml
                 kubectl apply -f k8s/frontend-service.yaml
+                '''
+            }
+        }
+
+        stage('Test Kubernetes') {
+            steps {
+                sh '''
+                export KUBECONFIG=/var/lib/jenkins/.kube/config
+                kubectl get nodes
                 '''
             }
         }
