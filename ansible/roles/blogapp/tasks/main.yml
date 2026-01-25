@@ -17,6 +17,7 @@
     published_ports:
       - "27017:27017"
 
+
 - name: Run backend container
   docker_container:
     name: blogapp_back
