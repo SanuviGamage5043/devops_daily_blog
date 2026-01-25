@@ -8,14 +8,6 @@
     - blogapp_back
     - blogapp_db
 
-- name: Run MongoDB container
-  docker_container:
-    name: blogapp_db
-    image: mongo:7.0
-    state: started
-    restart_policy: always
-    published_ports:
-      - "27017:27017"
 
 
 - name: Run backend container
