@@ -2,17 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USER = credentials('dockerhub-creds') // Docker Hub credentials
-        AWS_KEY     = credentials('aws-access-key')   // AWS credentials for Terraform
+        DOCKER_USER = credentials('dockerhub-creds')   // Docker Hub username/password
+        AWS_KEY     = credentials('aws-access-key')    // AWS credentials for Terraform
         AWS_SECRET  = credentials('aws-secret-key')
-        KUBECONFIG = '/var/lib/jenkins/.kube/config'
-    
+        KUBECONFIG  = '/var/lib/jenkins/.kube/config'
+        ANSIBLE_KEY = '/var/lib/jenkins/.ssh/NewDevopsKey.pem'
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
+                // Pull repo into Jenkins workspace
                 git branch: 'main', url: 'https://github.com/SanuviGamage5043/devops_daily_blog.git'
             }
         }
@@ -20,66 +21,89 @@ pipeline {
         // Terraform stages
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                dir("${WORKSPACE}") {
+                    sh 'terraform init'
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan -out=tfplan'
+                dir("${WORKSPACE}") {
+                    sh 'terraform plan -out=tfplan'
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply -auto-approve tfplan'
+                dir("${WORKSPACE}") {
+                    sh 'terraform apply -auto-approve tfplan'
+                }
             }
         }
 
         // Docker stages
         stage('Build Docker Images') {
             steps {
-                sh 'chmod +x ./scripts/build.sh'
-                sh './scripts/build.sh'
+                dir("${WORKSPACE}") {
+                    sh 'chmod +x ./scripts/build.sh'
+                    sh './scripts/build.sh'
+                }
             }
         }
 
         stage('Push Docker Images') {
             steps {
-                sh 'chmod +x ./scripts/push.sh'
-                sh "./scripts/push.sh $DOCKER_USER_USR $DOCKER_USER_PSW"
+                dir("${WORKSPACE}") {
+                    sh 'chmod +x ./scripts/push.sh'
+                    sh "./scripts/push.sh $DOCKER_USER_USR $DOCKER_USER_PSW"
+                }
             }
         }
 
         // Ansible deployment stage
         stage('Ansible Deploy') {
             steps {
+                // Make sure ansible is installed
                 sh 'sudo apt-get update && sudo apt-get install -y ansible'
-                sh 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml'
+
+                // Use correct inventory path and SSH key
+                dir("${WORKSPACE}") {
+                    sh """
+                    ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+                    --private-key $ANSIBLE_KEY -u ubuntu -v
+                    """
+                }
             }
         }
 
         // Kubernetes deployment stage
         stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                kubectl apply -f k8s/backend-deployment.yaml
-                kubectl apply -f k8s/backend-service.yaml
-                kubectl apply -f k8s/frontend-deployment.yaml
-                kubectl apply -f k8s/frontend-service.yaml
-                '''
+                dir("${WORKSPACE}") {
+                    sh """
+                    export KUBECONFIG=$KUBECONFIG
+                    kubectl apply -f k8s/backend-deployment.yaml
+                    kubectl apply -f k8s/backend-service.yaml
+                    kubectl apply -f k8s/frontend-deployment.yaml
+                    kubectl apply -f k8s/frontend-service.yaml
+                    """
+                }
             }
         }
 
         stage('Test Kubernetes') {
             steps {
-                sh '''
-                export KUBECONFIG=/var/lib/jenkins/.kube/config
+                sh """
+                export KUBECONFIG=$KUBECONFIG
                 kubectl get nodes
-                '''
+                kubectl get pods -n default
+                """
             }
         }
     }
+
     post {
         success {
             echo "CI/CD pipeline completed successfully!"
