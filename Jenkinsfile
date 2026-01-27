@@ -78,6 +78,16 @@ pipeline {
             }
         }
 
+        // EKS configuration stage
+        stage('Configure EKS') {
+            steps {
+            sh '''
+            aws eks update-kubeconfig --region ap-south-1 --name blogapp-eks
+            kubectl get nodes
+            '''
+            }
+        }
+
         // Kubernetes deployment stage
         stage('Deploy to Kubernetes') {
             steps {
@@ -88,6 +98,8 @@ pipeline {
                     kubectl apply -f k8s/backend-service.yaml
                     kubectl apply -f k8s/frontend-deployment.yaml
                     kubectl apply -f k8s/frontend-service.yaml
+                    kubectl get pods
+                    kubectl get svc
                     """
                 }
             }
