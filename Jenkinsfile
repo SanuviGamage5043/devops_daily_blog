@@ -22,8 +22,8 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir("${WORKSPACE}") {
-                    sh 'terraform init'
-                }
+                sh 'terraform init -upgrade'
+                }   
             }
         }
 
