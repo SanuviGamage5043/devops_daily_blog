@@ -40,13 +40,13 @@ This repo serves as a hands-on example of a production-ready DevOps workflow.
 
 Below is the high-level pipeline workflow:
 
-1. A[Code Commit to GitHub] --> B[GitHub Webhook Trigger];
-2. B --> C[Jenkins Pipeline];
-3. C --> D[Docker Build & Test];
-4. D --> E[Push Docker Image to Registry];
-5. E --> F[Teraform: Provision EC2 & Infra];
-6. F --> G[Ansible: Configure & Deploy App];
-7. G --> H[Kubernetes: Orchestrate & Manage Containers];
+    1. A[Code Commit to GitHub] --> B[GitHub Webhook Trigger];
+    2. B --> C[Jenkins Pipeline];
+    3. C --> D[Docker Build & Test];
+    4. D --> E[Push Docker Image to Registry];
+    5. E --> F[Teraform: Provision EC2 & Infra];
+    6. F --> G[Ansible: Configure & Deploy App];
+    7. G --> H[Kubernetes: Orchestrate & Manage Containers];
 
 # 🏗 Pipeline Workflow
 
