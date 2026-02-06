@@ -1,4 +1,5 @@
-# 🚀 Project Overview
+# Automated CI/CD Pipeline
+## 🚀 Project Overview
 
 This project demonstrates a full CI/CD pipeline integrating modern DevOps tools to automate the build, test, and deployment process of applications.
 
@@ -20,7 +21,7 @@ It covers:
 
 This repo serves as a hands-on example of a production-ready DevOps workflow.
 
-# 🛠 Tools Used
+## 🛠 Tools Used
 
 | Tool                | Purpose                                              |
 | ------------------- | ---------------------------------------------------- |
@@ -33,7 +34,7 @@ This repo serves as a hands-on example of a production-ready DevOps workflow.
 | **Kubernetes**      | Container orchestration & scaling                    |
 
 
-# 🌐 Architecture
+## 🌐 Architecture
 
 Below is the high-level pipeline workflow:
 
@@ -45,7 +46,7 @@ Below is the high-level pipeline workflow:
 6. F --> G[Ansible: Configure & Deploy App];
 7. G --> H[Kubernetes: Orchestrate & Manage Containers];
 
-# 🏗 Pipeline Workflow
+## 🏗 Pipeline Workflow
 
 - Code Commit → Push code to GitHub.
 
@@ -61,9 +62,9 @@ Below is the high-level pipeline workflow:
 
 - Orchestration → Kubernetes handles scaling, health checks, and rolling updates.
 
-# Setup Instructions
+## Setup Instructions
 
-Prerequisites
+### Prerequisites
 
 - Git
 
@@ -77,40 +78,40 @@ Prerequisites
 
 - Kubernetes cluster (local or cloud)
 
-# Steps
+### Steps
 
-### 1. Clone the Repository
+#### 1. Clone the Repository
 
     git clone https://github.com/SanuviGamage5043/devops_daily_blog.git
     cd devops_daily_blog
 
 
-### 2. Configure GitHub Webhook
+#### 2. Configure GitHub Webhook
 
 Settings → Webhooks → Add Jenkins webhook:
 
     http://<JENKINS_URL>/github-webhook/
 
 
-### 3. Build Docker Image
+#### 3. Build Docker Image
 
     docker build -t devops-daily-blog .
 
 
-### 4. Provision Infrastructure with Terraform
+#### 4. Provision Infrastructure with Terraform
 
     cd terraform
     terraform init
     terraform apply
 
 
-### 5. Deploy App with Ansible
+#### 5. Deploy App with Ansible
 
     cd ansible
     ansible-playbook deploy.yml -i hosts.ini
 
 
-### 6. Deploy on Kubernetes
+#### 6. Deploy on Kubernetes
 
     kubectl apply -f k8s-deployment.yml
 
