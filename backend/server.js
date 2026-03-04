@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import entryRoutes from "./routes/entryRoutes.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -16,16 +19,15 @@ app.get("/", (req, res) => {
 
 // API routes
 app.use("/users", userRoutes);
-app.use("/entries", entryRoutes); // ✅ Add this
+app.use("/entries", entryRoutes); 
 
 // MongoDB connection
-const mongoURI = "mongodb://blog-mongo:27017/blogDB"; // container MongoDB
 mongoose
-  .connect(mongoURI)
-  .then(() => console.log("MongoDB connected"))
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Atlas connected"))
   .catch((err) => console.error(err));
-
-const PORT = 5000;
+  
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () =>
   console.log(`Backend running on port ${PORT}`)
 );
