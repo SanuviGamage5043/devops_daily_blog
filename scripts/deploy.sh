@@ -6,20 +6,27 @@ docker stop blogapp_front || true
 docker rm blogapp_front || true
 docker stop blogapp_back || true
 docker rm blogapp_back || true
-docker stop blogapp_db || true
-docker rm blogapp_db || true
 
-echo "Deploying MongoDB container..."
-docker run -d -p 27017:27017 --name blogapp_db mongo:7.0
+echo "Logging in to DockerHub..."
+docker login -u "$1" -p "$2"
+
+echo "Pulling latest backend image..."
+docker pull sanuvi5043/blogapp-backend:latest
+
+echo "Pulling latest frontend image..."
+docker pull sanuvi5043/blogapp-frontend:latest
 
 echo "Deploying backend container..."
-docker run -d -p 5000:5000 --name blogapp_back \
-  --link blogapp_db:mongodb \
+docker run -d --name blogapp_back \
+  -e MONGO_URI="mongodb+srv://sanuvigamage5043_db_user:y7a018npyvXGyswB@clusterdevops.6vrvfmw.mongodb.net/blogapp_db" \
+  -e JWT_SECRET="supersecretkey123" \
+  -p 5000:5000 \
   sanuvi5043/blogapp-backend:latest
 
-echo "Deploying frontend container..."
-docker run -d -p 3000:3000 --name blogapp_front \
+echo "Deploying frontend container (NGINX)..."
+docker run -d --name blogapp_front \
   --link blogapp_back:backend \
+  -p 80:80 \
   sanuvi5043/blogapp-frontend:latest
 
 echo "Deployment complete. Running containers:"

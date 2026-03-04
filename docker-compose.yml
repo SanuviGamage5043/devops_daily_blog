@@ -1,25 +1,19 @@
+version: "3.9"
+
 services:
-  frontend:
-    build:
-      context: ./blog-app   
-      dockerfile: Dockerfile
-    container_name: blog-frontend
-    ports:
-      - "3000:3000"   
-    depends_on:
-      - backend
-    volumes:
-      - ./blog-app:/app
-      - /app/node_modules
 
   backend:
-    build:
-      context: ./backend    
-      dockerfile: Dockerfile
+    image: sanuvi5043/blogapp-backend
     container_name: blog-backend
+    env_file:
+      - ./backend/.env
     ports:
-      - "5000:5000"   
-    volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
+      - "5000:5000"
 
+  frontend:
+    image: sanuvi5043/blogapp-frontend
+    container_name: blog-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
