@@ -33,7 +33,7 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ubuntu']) {
+                sshagent(['ec2-ssh-key']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ubuntu@65.2.128.22 bash -s << 'ENDSSH'
                     mkdir -p ~/blog-app
