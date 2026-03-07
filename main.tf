@@ -2,16 +2,12 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-variable "ssh_key_file" {
-  description = "Path to private key file for SSH connection"
-  type        = string
-}
-
 resource "null_resource" "deploy_blogapp" {
+
   provisioner "remote-exec" {
     inline = [
       "sudo apt update",
-      "sudo apt install docker.io -y",
+      "sudo apt install -y docker.io",
 
       # Stop old containers
       "docker stop blogapp-frontend || true",
@@ -31,6 +27,7 @@ resource "null_resource" "deploy_blogapp" {
       host        = "65.2.128.22"
       user        = "ubuntu"
       private_key = file("/var/lib/jenkins/keys/newblogkey.pem")
+      timeout     = "2m"
     }
   }
 }
