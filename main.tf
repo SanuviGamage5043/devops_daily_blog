@@ -3,7 +3,8 @@ provider "aws" {
 }
 
 variable "ssh_key" {
-  description = "Private key for SSH connection"
+  description = "Private key content for SSH connection"
+  type        = string
 }
 
 resource "null_resource" "deploy_blogapp" {
@@ -27,9 +28,9 @@ resource "null_resource" "deploy_blogapp" {
 
     connection {
       type        = "ssh"
+      host        = "65.2.128.22"
       user        = "ubuntu"
       private_key = var.ssh_key
-      host        = "65.2.128.22"
     }
   }
 }

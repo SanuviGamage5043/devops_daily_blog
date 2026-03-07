@@ -3,11 +3,10 @@ pipeline {
 
     environment {
         DOCKER_USER = credentials('dockerhub-creds')   
-        SSH_KEY     = credentials('ec2-ssh-key')
+        SSH_KEY     = credentials('ec2-ssh-key')         // SSH private key content
         AWS_KEY     = credentials('aws-access-key')    
         AWS_SECRET  = credentials('aws-secret-key')
         KUBECONFIG  = '/var/lib/jenkins/.kube/config'
-        ANSIBLE_KEY = '/var/lib/jenkins/.ssh/newblogkey.pem'
     }
 
     stages {
@@ -66,7 +65,7 @@ pipeline {
                     sh 'sudo apt-get update && sudo apt-get install -y ansible'
                     sh """
                     ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
-                    --private-key $SSH_KEY -u ubuntu -v
+                    --private-key <(echo "$SSH_KEY") -u ubuntu -v
                     """
                 }
             }
