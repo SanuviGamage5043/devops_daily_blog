@@ -32,8 +32,8 @@ pipeline {
             steps {
             sh 'terraform apply -auto-approve tfplan'
             
-    }
-
+            }
+        }
         // stage('Build Docker Images') {
         //     steps {
         //         dir("${WORKSPACE}") {
