@@ -38,7 +38,8 @@ pipeline {
             steps {
                 dir("${WORKSPACE}") {
                     withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                        sh "terraform apply -var 'ssh_key_file=$SSH_KEY_FILE' -auto-approve tfplan"
+                    // Remove -var here
+                        sh "terraform apply -auto-approve tfplan"
                     }
                 }
             }
