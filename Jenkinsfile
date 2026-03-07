@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         DOCKER_USER = credentials('dockerhub-creds')   
-        SSH_KEY     = credentials('ec2-ssh-key')         // SSH private key content
         AWS_KEY     = credentials('aws-access-key')    
         AWS_SECRET  = credentials('aws-secret-key')
         KUBECONFIG  = '/var/lib/jenkins/.kube/config'
@@ -28,7 +27,9 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 dir("${WORKSPACE}") {
-                    sh "terraform plan -var 'ssh_key=$SSH_KEY' -out=tfplan"
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
+                        sh "terraform plan -var 'ssh_key_file=$SSH_KEY_FILE' -out=tfplan"
+                    }
                 }
             }
         }
@@ -36,7 +37,9 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir("${WORKSPACE}") {
-                    sh "terraform apply -var 'ssh_key=$SSH_KEY' -auto-approve tfplan"
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
+                        sh "terraform apply -var 'ssh_key_file=$SSH_KEY_FILE' -auto-approve tfplan"
+                    }
                 }
             }
         }
@@ -63,10 +66,12 @@ pipeline {
             steps {
                 dir("${WORKSPACE}") {
                     sh 'sudo apt-get update && sudo apt-get install -y ansible'
-                    sh """
-                    ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
-                    --private-key <(echo "$SSH_KEY") -u ubuntu -v
-                    """
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
+                        sh """
+                        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+                        --private-key $SSH_KEY_FILE -u ubuntu -v
+                        """
+                    }
                 }
             }
         }

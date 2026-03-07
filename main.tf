@@ -2,8 +2,8 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-variable "ssh_key" {
-  description = "Private key content for SSH connection"
+variable "ssh_key_file" {
+  description = "Path to private key file for SSH connection"
   type        = string
 }
 
@@ -30,7 +30,7 @@ resource "null_resource" "deploy_blogapp" {
       type        = "ssh"
       host        = "65.2.128.22"
       user        = "ubuntu"
-      private_key = var.ssh_key
+      private_key = file(var.ssh_key_file)
     }
   }
 }
