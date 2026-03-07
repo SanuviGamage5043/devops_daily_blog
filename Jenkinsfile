@@ -33,7 +33,7 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ubuntu']) { // Jenkins SSH key ID
+                sshagent(['ec2-ssh-key']) { // Jenkins SSH key ID
                     sh """
                     ssh -o StrictHostKeyChecking=no ubuntu@65.2.128.22 'bash -s' <<'ENDSSH'
                     cd /home/ubuntu/blog-app
