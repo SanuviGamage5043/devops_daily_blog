@@ -33,12 +33,21 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ec2-ssh-key']) { // Jenkins SSH key ID
+                sshagent(['ubuntu']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@65.2.128.22 'bash -s' <<'ENDSSH'
-                    cd /home/ubuntu/blog-app
+                    ssh -o StrictHostKeyChecking=no ubuntu@65.2.128.22 bash -s << 'ENDSSH'
+                    mkdir -p ~/blog-app
+                    cd ~/blog-app
+
+                    if [ -d .git ]; then
+                        git reset --hard
+                        git pull
+                    else
+                        git clone https://github.com/SanuviGamage5043/devops_daily_blog.git .
+                    fi
+
                     chmod +x ./scripts/deploy.sh
-                    ./scripts/deploy.sh $DOCKER_USER_USR $DOCKER_USER_PSW
+                    ./scripts/deploy.sh
                     ENDSSH
                     """
                 }
