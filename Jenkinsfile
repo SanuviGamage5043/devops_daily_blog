@@ -66,10 +66,10 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key']) {
                 sh """
-                ssh -o StrictHostKeyChecking=no ubuntu@EC2_PUBLIC_IP '
+                ssh -o StrictHostKeyChecking=no ubuntu@65.2.128.22'
                 cd /home/ubuntu/blog-app
                 chmod +x deploy.sh
-                ./deploy.sh $DOCKER_USER_USR $DOCKER_USER_PSW
+                ./deploy.sh 
             '
             """
         }
