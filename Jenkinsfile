@@ -3,6 +3,10 @@ pipeline {
 
     environment {
         DOCKER_USER = credentials('dockerhub-creds')   
+        AWS_KEY     = credentials('aws-access-key')    
+        AWS_SECRET  = credentials('aws-secret-key')
+        KUBECONFIG  = '/var/lib/jenkins/.kube/config'
+        ANSIBLE_KEY = '/var/lib/jenkins/.ssh/newblogkey.pem'
     }
 
     stages {
@@ -13,6 +17,32 @@ pipeline {
             }
         }
 
+        // -------------------- Terraform --------------------
+        stage('Terraform Init') {
+            steps {
+                dir("${WORKSPACE}") {
+                    sh 'terraform init -upgrade'
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir("${WORKSPACE}") {
+                    sh 'terraform plan -out=tfplan'
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir("${WORKSPACE}") {
+                    sh 'terraform apply -auto-approve tfplan'
+                }
+            }
+        }
+
+        // -------------------- Docker --------------------
         stage('Build Docker Images') {
             steps {
                 dir("${WORKSPACE}") {
@@ -31,29 +61,47 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+        
+
+        // -------------------- Ansible (optional) --------------------
+        stage('Ansible Deploy') {
             steps {
-                sshagent(['ec2-ssh-key']) {
+                sh 'sudo apt-get update && sudo apt-get install -y ansible'
+                dir("${WORKSPACE}") {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@65.2.128.22 bash -s << EOF
-                    mkdir -p ~/blog-app
-                    cd ~/blog-app
-
-                    if [ -d .git ]; then
-                        git reset --hard
-                        git pull
-                    else
-                        git clone https://github.com/SanuviGamage5043/devops_daily_blog.git .
-                    fi
-
-                    chmod +x ./scripts/deploy.sh
-                    ./scripts/deploy.sh
-                EOF
+                    ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+                    --private-key $ANSIBLE_KEY -u ubuntu -v
                     """
                 }
             }
         }
 
+        // -------------------- Kubernetes Deployment --------------------
+        stage('Deploy to Kubernetes') {
+            steps {
+                dir("${WORKSPACE}") {
+                    sh """
+                    export KUBECONFIG=$KUBECONFIG
+                    kubectl apply -f k8s/backend-deployment.yaml
+                    kubectl apply -f k8s/backend-service.yaml
+                    kubectl apply -f k8s/frontend-deployment.yaml
+                    kubectl apply -f k8s/frontend-service.yaml
+                    kubectl get pods
+                    kubectl get svc
+                    """
+                }
+            }
+        }
+
+        stage('Test Kubernetes') {
+            steps {
+                sh """
+                export KUBECONFIG=$KUBECONFIG
+                kubectl get nodes
+                kubectl get pods -n default
+                """
+            }
+        }
     }
 
     post {

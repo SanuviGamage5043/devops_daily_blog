@@ -17,3 +17,6 @@ spec:
           image: sanuvi5043/blogapp-backend:latest
           ports:
             - containerPort: 5000
+          env:
+            - name: MONGODB_URI
+              value: "mongodb+srv://sanuvigamage5043_db_user:y7a018npyvXGyswB@clusterdevops.6vrvfmw.mongodb.net/blogapp_db"

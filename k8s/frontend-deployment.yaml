@@ -17,3 +17,6 @@ spec:
           image: sanuvi5043/blogapp-frontend:latest
           ports:
             - containerPort: 3000
+          env:
+            - name: BACKEND_URL
+              value: "http://blogapp-backend:5000"

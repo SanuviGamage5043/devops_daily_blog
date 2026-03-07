@@ -6,9 +6,6 @@
   loop:
     - blogapp_front
     - blogapp_back
-    - blogapp_db
-
-
 
 - name: Run backend container
   docker_container:
@@ -18,6 +15,8 @@
     restart_policy: always
     published_ports:
       - "5000:5000"
+    env:
+      MONGO_URL: "mongodb+srv://<username>:<password>@<cluster-url>/blogdb?retryWrites=true&w=majority"
 
 - name: Run frontend container
   docker_container:
@@ -27,3 +26,5 @@
     restart_policy: always
     published_ports:
       - "3000:3000"
+    links:
+      - blogapp_back:backend
