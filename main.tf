@@ -30,7 +30,7 @@ resource "null_resource" "deploy_blogapp" {
       type        = "ssh"
       host        = "65.2.128.22"
       user        = "ubuntu"
-      private_key = file(var.ssh_key_file)
+      private_key = file("/var/lib/jenkins/keys/newblogkey.pem")
     }
   }
 }

@@ -18,32 +18,21 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                dir("${WORKSPACE}") {
-                    sh 'terraform init -upgrade'
-                }
+                sh 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                dir("${WORKSPACE}") {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                        sh "terraform plan -var 'ssh_key_file=$SSH_KEY_FILE' -out=tfplan"
-                    }
-                }
+                sh 'terraform plan -out=tfplan'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                dir("${WORKSPACE}") {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                    // Remove -var here
-                        sh "terraform apply -auto-approve tfplan"
-                    }
-                }
-            }
-        }
+            sh 'terraform apply -auto-approve tfplan'
+            
+    }
 
         // stage('Build Docker Images') {
         //     steps {
