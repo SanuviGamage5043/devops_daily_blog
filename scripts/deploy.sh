@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+DOCKER_USER=$1
+DOCKER_PASS=$2
+
 echo "Stopping existing containers..."
 docker stop blogapp_front || true
 docker rm blogapp_front || true
@@ -8,7 +11,7 @@ docker stop blogapp_back || true
 docker rm blogapp_back || true
 
 echo "Logging in to DockerHub..."
-docker login -u "$1" -p "$2"
+echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
 echo "Pulling latest backend image..."
 docker pull sanuvi5043/blogapp-backend:latest
@@ -23,7 +26,7 @@ docker run -d --name blogapp_back \
   -p 5000:5000 \
   sanuvi5043/blogapp-backend:latest
 
-echo "Deploying frontend container (NGINX)..."
+echo "Deploying frontend container..."
 docker run -d --name blogapp_front \
   --link blogapp_back:backend \
   -p 80:80 \

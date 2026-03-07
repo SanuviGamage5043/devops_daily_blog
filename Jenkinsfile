@@ -35,7 +35,7 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@65.2.128.22 bash -s << 'ENDSSH'
+                    ssh -o StrictHostKeyChecking=no ubuntu@65.2.128.22 bash -s << ENDSSH
                     mkdir -p ~/blog-app
                     cd ~/blog-app
 
@@ -47,7 +47,7 @@ pipeline {
                     fi
 
                     chmod +x ./scripts/deploy.sh
-                    ./scripts/deploy.sh
+                    ./scripts/deploy.sh $DOCKER_USER_USR $DOCKER_USER_PSW
                     ENDSSH
                     """
                 }
