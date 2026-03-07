@@ -3,10 +3,10 @@ pipeline {
 
     environment {
         DOCKER_USER = credentials('dockerhub-creds')   
-        AWS_KEY     = credentials('aws-access-key')    
-        AWS_SECRET  = credentials('aws-secret-key')
-        KUBECONFIG  = '/var/lib/jenkins/.kube/config'
-        ANSIBLE_KEY = '/var/lib/jenkins/.ssh/NewDevopsKey.pem'
+        // AWS_KEY     = credentials('aws-access-key')    
+        // AWS_SECRET  = credentials('aws-secret-key')
+        // KUBECONFIG  = '/var/lib/jenkins/.kube/config'
+        // ANSIBLE_KEY = '/var/lib/jenkins/.ssh/NewDevopsKey.pem'
     }
 
     stages {
