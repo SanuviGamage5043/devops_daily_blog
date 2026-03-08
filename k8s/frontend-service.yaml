@@ -5,7 +5,8 @@ metadata:
 spec:
   selector:
     app: blogapp-frontend
+  type: NodePort
   ports:
     - port: 80
       targetPort: 3000
-  type: LoadBalancer
+      nodePort: 30080
