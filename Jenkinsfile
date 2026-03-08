@@ -66,21 +66,21 @@ pipeline {
             }
         }
 
-        // stage('Deploy to Kubernetes') {
-        //     steps {
-        //         dir("${WORKSPACE}") {
-        //             sh """
-        //             export KUBECONFIG=/var/lib/jenkins/.kube/config
-        //             kubectl apply -f k8s/backend-deployment.yaml
-        //             kubectl apply -f k8s/backend-service.yaml
-        //             kubectl apply -f k8s/frontend-deployment.yaml
-        //             kubectl apply -f k8s/frontend-service.yaml
-        //             kubectl get pods
-        //             kubectl get svc
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Deploy to Kubernetes') {
+            steps {
+                dir("${WORKSPACE}") {
+                    sh """
+                    export KUBECONFIG=/var/lib/jenkins/.kube/config
+                    kubectl apply -f k8s/backend-deployment.yaml
+                    kubectl apply -f k8s/backend-service.yaml
+                    kubectl apply -f k8s/frontend-deployment.yaml
+                    kubectl apply -f k8s/frontend-service.yaml
+                    kubectl get pods
+                    kubectl get svc
+                    """
+                }
+            }
+        }
     }
 
     post {
