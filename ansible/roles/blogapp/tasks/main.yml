@@ -1,11 +1,18 @@
 ---
-- name: Stop old containers
+- name: Stop and remove old containers
   docker_container:
     name: "{{ item }}"
     state: absent
+    force_kill: true
   loop:
     - blogapp_front
     - blogapp_back
+
+- name: Pull latest backend image
+  docker_image:
+    name: sanuvi5043/blogapp-backend
+    tag: latest
+    source: pull
 
 - name: Run backend container
   docker_container:
@@ -15,6 +22,12 @@
     restart_policy: always
     published_ports:
       - "5000:5000"
+
+- name: Pull latest frontend image
+  docker_image:
+    name: sanuvi5043/blogapp-frontend
+    tag: latest
+    source: pull
 
 - name: Run frontend container
   docker_container:
