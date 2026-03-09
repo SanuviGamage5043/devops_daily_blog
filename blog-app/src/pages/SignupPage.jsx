@@ -8,6 +8,7 @@ export default function SignupPage() {
     password: "",
     confirmPassword: "",
   });
+
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -25,9 +26,11 @@ export default function SignupPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/users/signup", {
+      const res = await fetch("/api/users/signup", {   // ✅ FIXED
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -41,13 +44,10 @@ export default function SignupPage() {
         setError(data.error || "Signup failed");
       } else {
         console.log("Signup successful:", data);
-        console.log("Name:", data.user.name);
-        console.log("Email:", data.user.email);
-
-        // Navigate directly to /home
         navigate("/");
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Something went wrong. Please try again.");
     }
   };
@@ -60,6 +60,7 @@ export default function SignupPage() {
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
           <div>
             <label className="block text-sm font-medium text-gray-700">Name</label>
             <input
@@ -68,7 +69,7 @@ export default function SignupPage() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 mt-1 border rounded-md"
             />
           </div>
 
@@ -80,7 +81,7 @@ export default function SignupPage() {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 mt-1 border rounded-md"
             />
           </div>
 
@@ -92,7 +93,7 @@ export default function SignupPage() {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 mt-1 border rounded-md"
             />
           </div>
 
@@ -104,13 +105,13 @@ export default function SignupPage() {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 mt-1 border rounded-md"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
+            className="w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
             Sign Up
           </button>
@@ -118,7 +119,7 @@ export default function SignupPage() {
 
         <p className="text-sm text-center text-gray-600">
           Already have an account?{" "}
-          <Link to="/" className="font-semibold text-blue-600 hover:underline">
+          <Link to="/" className="font-semibold text-blue-600">
             Login
           </Link>
         </p>
