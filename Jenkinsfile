@@ -6,6 +6,9 @@ pipeline {
         AWS_KEY     = credentials('aws-access-key')    
         AWS_SECRET  = credentials('aws-secret-key')
         KUBECONFIG  = '/var/lib/jenkins/.kube/config'
+        TF_VAR_aws_access_key = "${AWS_KEY}"
+        TF_VAR_aws_secret_key = "${AWS_SECRET}"
+
     }
 
     stages {
@@ -28,7 +31,9 @@ pipeline {
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan -out=tfplan'
+                withEnv(["AWS_ACCESS_KEY_ID=${AWS_KEY}", "AWS_SECRET_ACCESS_KEY=${AWS_SECRET}"]) {
+                    sh 'terraform plan -out=tfplan'
+                }
             }
         }
 
