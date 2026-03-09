@@ -25,7 +25,7 @@ export default function SignupPage() {
     }
 
     try {
-      const res = await fetch("http://65.2.128.22/:5000/users/signup", {
+      const res = await fetch("http://65.2.128.22:5000/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -36,16 +36,13 @@ export default function SignupPage() {
       });
 
       const data = await res.json();
+      console.log(data);
 
       if (!res.ok) {
         setError(data.error || "Signup failed");
       } else {
         console.log("Signup successful:", data);
-        console.log("Name:", data.user.name);
-        console.log("Email:", data.user.email);
-
-        // Navigate directly to /home
-        navigate("/");
+        navigate("/"); // redirect to home
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -61,7 +58,9 @@ export default function SignupPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
             <input
               type="text"
               name="name"
@@ -73,7 +72,9 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
@@ -85,7 +86,9 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -97,7 +100,9 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
             <input
               type="password"
               name="confirmPassword"
