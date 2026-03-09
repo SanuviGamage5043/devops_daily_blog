@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:5000/users/login", formData);
+      const res = await axios.post("http://65.2.128.22:5000/users/login", formData);
       const data = res.data;
 
       console.log("Login successful:", data.user);
