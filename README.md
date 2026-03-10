@@ -2,25 +2,39 @@
 
 ## 📌 Project Overview
 
-This project demonstrates a complete DevOps automation pipeline for deploying a cloud-native blog application on an EC2-based infrastructure.
+This project demonstrates a complete DevOps automation pipeline for deploying a cloud-native blog application ("Life Journal") on an EC2-based infrastructure.
 
-The system provisions infrastructure using Terraform, configures servers using Ansible, containerizes the application with Docker, orchestrates containers using Kubernetes, and automates CI/CD using Jenkins — all hosted on an EC2 instance.
+The system provisions infrastructure using Terraform, configures servers using Ansible, containerizes the application with Docker, orchestrates containers with Kubernetes, and automates CI/CD using Jenkins — all hosted on an EC2 instance.
+
+The blog app allows users to:
+
+- Create, update, and delete journal entries
+
+- Track moods and monthly statistics
+
+- Export entries in JSON or CSV
+
+- View recent entries on a dashboard
 
 ## 🔑 Key Highlights
 
-- Infrastructure provisioning using Terraform
+- Full-stack Life Journal blog application
+
+- Infrastructure provisioning with Terraform
 
 - EC2-based deployment architecture
 
-- Configuration management using Ansible
+- Server configuration using Ansible
 
-- Containerization with Docker
+- Containerization using Docker
 
-- Kubernetes orchestration
+- Kubernetes orchestration for scaling
 
-- CI/CD pipeline with Jenkins
+- CI/CD pipeline with Jenkins for automated deployments
 
-- Automated end-to-end deployment
+- API-based backend with Node.js/Express
+
+- React frontend with responsive dashboard
 
 ## 🏗 Architecture Overview
     Developer → GitHub → Jenkins (EC2)
@@ -46,6 +60,7 @@ All core components (Jenkins, Docker, Kubernetes cluster) are deployed on an EC2
 | CI/CD                    | Jenkins             | Automated pipeline           |
 | Backend                  | Node.js / Express   | REST API                     |
 | Frontend                 | React               | Web UI                       |
+| Database                 | MongoDB Atlas       | Data storage                      |
 
 ## 🗂 Project Structure
 
