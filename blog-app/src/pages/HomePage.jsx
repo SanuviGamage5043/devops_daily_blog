@@ -15,7 +15,7 @@ const HomePage = () => {
     const fetchEntries = async () => {
       try {
         const res = await axios.get(
-          "http://65.2.128.22:5000/entries/user",
+          "http://65.2.128.22:5000/entries/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
