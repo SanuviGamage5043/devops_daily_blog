@@ -8,7 +8,11 @@ export default function SignupPage() {
     password: "",
     confirmPassword: "",
   });
+
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -36,13 +40,11 @@ export default function SignupPage() {
       });
 
       const data = await res.json();
-      console.log(data);
 
       if (!res.ok) {
         setError(data.error || "Signup failed");
       } else {
-        console.log("Signup successful:", data);
-        navigate("/"); // redirect to home
+        navigate("/"); 
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -50,72 +52,104 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-center">Create an Account</h2>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 px-4">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-xl">
 
-        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        {/* Website Title */}
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-indigo-600">Life Journal</h1>
+          <p className="text-gray-500 text-sm">
+            Start capturing your memories
+          </p>
+        </div>
+
+        <h2 className="text-xl font-semibold text-center text-gray-700">
+          Create an Account
+        </h2>
+
+        {error && (
+          <p className="text-red-500 text-sm text-center">{error}</p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name
-            </label>
+
+          {/* Name */}
+          <div className="relative">
+            <span className="absolute left-3 top-2.5 text-gray-400">👤</span>
             <input
               type="text"
               name="name"
+              placeholder="Full Name"
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+          {/* Email */}
+          <div className="relative">
+            <span className="absolute left-3 top-2.5 text-gray-400">📧</span>
             <input
               type="email"
               name="email"
+              placeholder="Email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
+          {/* Password */}
+          <div className="relative">
+            <span className="absolute left-3 top-2.5 text-gray-400">🔒</span>
+
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
+              placeholder="Password"
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
             />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 text-gray-500"
+            >
+            </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
+          {/* Confirm Password */}
+          <div className="relative">
+            <span className="absolute left-3 top-2.5 text-gray-400">🔒</span>
+
             <input
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
+              placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
             />
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowConfirmPassword(!showConfirmPassword)
+              }
+              className="absolute right-3 top-2.5 text-gray-500"
+            >
+            </button>
           </div>
 
           <button
             type="submit"
-            className="w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
+            className="w-full py-2 text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 transition font-medium"
           >
             Sign Up
           </button>
@@ -123,7 +157,10 @@ export default function SignupPage() {
 
         <p className="text-sm text-center text-gray-600">
           Already have an account?{" "}
-          <Link to="/" className="font-semibold text-blue-600 hover:underline">
+          <Link
+            to="/"
+            className="font-semibold text-indigo-600 hover:underline"
+          >
             Login
           </Link>
         </p>

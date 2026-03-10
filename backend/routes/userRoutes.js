@@ -1,14 +1,15 @@
-// routes/userRoutes.js
 import express from "express";
-import { createUser, loginUser } from "../controllers/userController.js";
+import { createUser, loginUser, getCurrentUser, updateUserSettings } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+// Public routes
 router.post("/signup", createUser);
 router.post("/login", loginUser);
 
-// Protected route example — only logged-in users can access
-// router.get("/", protect, getUsers);
+// Protected routes
+router.get("/me", protect, getCurrentUser);           
+router.put("/me/settings", protect, updateUserSettings); 
 
 export default router;

@@ -2,24 +2,26 @@ import express from "express";
 import {
   createEntry,
   getEntriesByUser,
+  updateEntry,
   deleteEntry,
-  updateEntry
+  getAnalytics,
+  exportEntries
 } from "../controllers/entryController.js";
-import { upload } from "../middleware/uploadMiddleware.js";
-import { protect } from "../middleware/authMiddleware.js"; // JWT auth
+import { protect } from "../middleware/authMiddleware.js";
+import { upload } from "../middleware/multerMiddleware.js";
 
 const router = express.Router();
 
-// Create new entry with optional files
-router.post("/", protect, upload.array("files", 10), createEntry);
+// CRUD
+router.post("/", protect, upload.array("files"), createEntry);       
+router.get("/", protect, getEntriesByUser);                         
+router.put("/:id", protect, upload.array("files"), updateEntry);    
+router.delete("/:id", protect, deleteEntry);                        
 
-// Get entries for logged-in user
-router.get("/user", protect, getEntriesByUser);
+// Analytics
+router.get("/analytics", protect, getAnalytics);
 
-// Update entry by ID with optional new files
-router.put("/:id", protect, upload.array("files", 10), updateEntry);
-
-// Delete entry by ID
-router.delete("/:id", protect, deleteEntry);
+// Export
+router.get("/export", protect, exportEntries);
 
 export default router;

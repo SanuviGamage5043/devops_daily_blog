@@ -10,14 +10,14 @@ const AllEntriesPage = () => {
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
 
+  // Fetch all user entries
   useEffect(() => {
     const fetchEntries = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/entries/user`, {
+        const res = await axios.get(`http://65.2.128.22:5000/entries/user`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setEntries(res.data);
@@ -29,13 +29,13 @@ const AllEntriesPage = () => {
       }
     };
     fetchEntries();
-  }, [token, userId]);
+  }, [token]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this entry?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/entries/${id}`, {
+      await axios.delete(`http://65.2.128.22:5000/entries/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEntries(entries.filter((entry) => entry._id !== id));
@@ -69,78 +69,72 @@ const AllEntriesPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
       <NavBar />
-      <div className="max-w-4xl mx-auto p-6 pt-12">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">All Entries</h1>
+      <div className="max-w-5xl mx-auto p-6 pt-12">
+
+        <h1 className="text-3xl font-bold text-indigo-700 mb-6">All Entries</h1>
 
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="Search entries..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mb-2"
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mb-6"
         />
 
         {loading ? (
           <div className="text-center text-gray-500 p-6">Loading...</div>
         ) : filteredEntries.length > 0 ? (
-          filteredEntries.map((entry) => (
-            <div
-              key={entry._id}
-              className="bg-white p-5 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition duration-300 cursor-pointer relative"
-            >
-              <h2 className="text-xl font-bold text-gray-900 mb-1">{entry.title}</h2>
-              <span
-                className={`${getMoodClasses(entry.mood)} text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase`}
+          <div className="space-y-5">
+            {filteredEntries.map((entry) => (
+              <div
+                key={entry._id}
+                className="bg-white p-5 rounded-2xl shadow-md border border-gray-200 hover:shadow-xl transition duration-300 relative"
               >
-                {entry.mood}
-              </span>
-              <span className="ml-2 text-sm text-gray-500">
-                {new Date(entry.createdAt).toLocaleDateString()}
-              </span>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-1">{entry.title}</h2>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <span className={`${getMoodClasses(entry.mood)} text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase`}>
+                        {entry.mood}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {new Date(entry.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-gray-700 line-clamp-3">{entry.content}</p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {entry.tags?.map((tag, i) => (
+                        <span key={i} className="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
 
-              <p className="text-gray-600 line-clamp-2 mb-2">{entry.content}</p>
-              <div className="flex flex-wrap gap-1">
-                {entry.tags?.map((tag, i) => (
-                  <span
-                    key={i}
-                    className="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full"
-                  >
-                    #{tag}
-                  </span>
-                ))}
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleEdit(entry._id)}
+                      className="p-2 rounded-full text-gray-400 hover:text-indigo-600 hover:bg-gray-100 transition"
+                      title="Edit Entry"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => handleDelete(entry._id)}
+                      className="p-2 rounded-full text-gray-400 hover:text-red-600 hover:bg-gray-100 transition"
+                      title="Delete Entry"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
               </div>
-
-              <div className="absolute top-4 right-4 flex space-x-2">
-                {/* Edit Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(entry._id);
-                  }}
-                  className="text-gray-400 hover:text-indigo-600 p-1 rounded-full hover:bg-gray-100"
-                  title="Edit Entry"
-                >
-                  ✏️
-                </button>
-
-                {/* Delete Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(entry._id);
-                  }}
-                  className="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-gray-100"
-                  title="Delete Entry"
-                >
-                  🗑️
-                </button>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         ) : (
-          <div className="text-center p-10 bg-white rounded-lg shadow-md text-gray-500">
+          <div className="text-center p-10 bg-white rounded-2xl shadow-md text-gray-500">
             No entries found.
           </div>
         )}

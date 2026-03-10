@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import NavBar from "../components/NavBar.jsx";
 
 const moods = [
   { label: "Neutral", emoji: "😐", value: "neutral" },
@@ -14,6 +15,7 @@ const EditEntryPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const fullName = localStorage.getItem("userName");
 
   const [formState, setFormState] = useState({
     title: "",
@@ -21,17 +23,16 @@ const EditEntryPage = () => {
     content: "",
     tags: "",
   });
-
   const [existingAttachments, setExistingAttachments] = useState([]);
   const [newFiles, setNewFiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- Fetch entry from API ---
+  // Fetch entry from backend
   useEffect(() => {
     const fetchEntry = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/entries/${id}`, {
+        const res = await axios.get(`http://65.2.128.22:5000/entries/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const entry = res.data;
@@ -39,7 +40,7 @@ const EditEntryPage = () => {
           title: entry.title,
           mood: entry.mood,
           content: entry.content,
-          tags: entry.tags,
+          tags: entry.tags?.join(", ") || "",
         });
         setExistingAttachments(entry.attachments || []);
       } catch (err) {
@@ -49,7 +50,6 @@ const EditEntryPage = () => {
         setLoading(false);
       }
     };
-
     fetchEntry();
   }, [id, token]);
 
@@ -64,15 +64,12 @@ const EditEntryPage = () => {
 
   const handleRemoveAttachment = (attachmentId) => {
     if (window.confirm("Are you sure you want to remove this attachment?")) {
-      setExistingAttachments((prev) =>
-        prev.filter((att) => att.id !== attachmentId)
-      );
+      setExistingAttachments((prev) => prev.filter((att) => att.id !== attachmentId));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const formData = new FormData();
       formData.append("title", formState.title);
@@ -82,66 +79,49 @@ const EditEntryPage = () => {
 
       newFiles.forEach((file) => formData.append("files", file));
 
-      // Update entry via API
-      await axios.put(`http://localhost:5000/entries/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
+      // Update entry
+      await axios.put(`http://65.2.128.22:5000/entries/${id}`, formData, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
 
-      alert("Entry updated successfully!");
+      alert("✅ Entry updated successfully!");
       navigate("/entries");
     } catch (err) {
       console.error("Error updating entry:", err);
-      alert("Failed to update entry");
+      alert("❌ Failed to update entry");
     }
   };
 
-  const handleCancel = () => navigate(-1);
+  const handleCancel = () => navigate("/entries");
 
   const currentMood = moods.find((m) => m.value === formState.mood);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
         <p className="text-lg text-indigo-600">Loading entry #{id}...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white border-b border-gray-200 p-4 shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-2 text-indigo-600 font-semibold text-xl">
-            My Journal
-          </div>
-          <div className="text-sm text-gray-600">
-            Welcome, <span className="font-medium text-gray-800">John</span> |
-            <button className="text-indigo-600 hover:text-indigo-800 font-medium ml-1">
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
+      <NavBar />
 
-      <div className="max-w-2xl mx-auto bg-white mt-10 p-8 rounded-xl shadow-lg border border-gray-200">
-        <h1 className="text-3xl font-serif font-bold text-gray-800 mb-8">
-          Edit Journal Entry
-        </h1>
+      <div className="max-w-2xl mx-auto bg-white mt-10 p-8 rounded-2xl shadow-xl border border-gray-200">
+        <h1 className="text-3xl font-serif font-bold text-indigo-700 mb-8">Edit Journal Entry</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+
           {/* Title */}
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">
-              Title
-            </label>
+            <label className="block text-base font-medium text-gray-700 mb-1">Title</label>
             <input
               type="text"
               name="title"
               value={formState.title}
               onChange={handleChange}
+              placeholder="Give your entry a title..."
               className="w-full border border-gray-300 rounded-lg p-3 focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
@@ -149,9 +129,7 @@ const EditEntryPage = () => {
 
           {/* Mood */}
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">
-              How are you feeling?
-            </label>
+            <label className="block text-base font-medium text-gray-700 mb-1">How are you feeling?</label>
             <div className="relative">
               <select
                 name="mood"
@@ -159,28 +137,25 @@ const EditEntryPage = () => {
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 text-lg focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer"
               >
-                {moods.map((mood) => (
-                  <option key={mood.value} value={mood.value}>
-                    {mood.emoji} {mood.label}
+                {moods.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.emoji} {m.label}
                   </option>
                 ))}
               </select>
-              <span className="absolute top-0 left-0 pt-3 pl-3 text-xl pointer-events-none">
-                {currentMood?.emoji}
-              </span>
+              <span className="absolute top-0 left-0 pt-3 pl-3 text-xl pointer-events-none">{currentMood?.emoji}</span>
             </div>
           </div>
 
           {/* Content */}
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">
-              Content
-            </label>
+            <label className="block text-base font-medium text-gray-700 mb-1">Content</label>
             <textarea
               name="content"
               rows={8}
               value={formState.content}
               onChange={handleChange}
+              placeholder="Write your thoughts here..."
               className="w-full border border-gray-300 rounded-lg p-3 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
               required
             />
@@ -194,10 +169,7 @@ const EditEntryPage = () => {
               </h3>
               <ul className="space-y-2">
                 {existingAttachments.map((att) => (
-                  <li
-                    key={att.id}
-                    className="flex justify-between items-center text-sm text-gray-600"
-                  >
+                  <li key={att.id} className="flex justify-between items-center text-sm text-gray-600">
                     <span className="truncate">{att.name}</span>
                     <button
                       type="button"
@@ -214,9 +186,7 @@ const EditEntryPage = () => {
 
           {/* Add New Files */}
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">
-              Add New Files
-            </label>
+            <label className="block text-base font-medium text-gray-700 mb-1">Add New Files</label>
             <input
               type="file"
               multiple
@@ -229,14 +199,13 @@ const EditEntryPage = () => {
 
           {/* Tags */}
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">
-              Tags
-            </label>
+            <label className="block text-base font-medium text-gray-700 mb-1">Tags</label>
             <input
               type="text"
               name="tags"
               value={formState.tags}
               onChange={handleChange}
+              placeholder="work, personal, goals..."
               className="w-full border border-gray-300 rounded-lg p-3 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validatePassword } from "../utils/validatePassword.js";
 
+// Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET || "yourSecretKey", {
     expiresIn: "7d",
@@ -46,7 +47,48 @@ export const loginUser = async (req, res) => {
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = generateToken(user._id);
-    res.json({ message: "Login successful", user: { id: user._id, name: user.name, email: user.email }, token });
+    res.json({
+      message: "Login successful",
+      user: { id: user._id, name: user.name, email: user.email },
+      token,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Get current logged-in user (used in /users/me)
+export const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Update user settings / reminders
+export const updateUserSettings = async (req, res) => {
+  try {
+    const { name, email, remindersEnabled, reminderTime, newPassword } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (typeof remindersEnabled === "boolean") user.remindersEnabled = remindersEnabled;
+    if (reminderTime) user.reminderTime = reminderTime;
+
+    if (newPassword) {
+      const passwordError = validatePassword(newPassword);
+      if (passwordError) return res.status(400).json({ error: passwordError });
+      user.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    await user.save();
+    res.json({ message: "Settings updated successfully", user: { id: user._id, name: user.name, email: user.email, remindersEnabled: user.remindersEnabled, reminderTime: user.reminderTime } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

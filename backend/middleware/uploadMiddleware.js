@@ -1,19 +1,19 @@
 import multer from "multer";
 import path from "path";
 
-// Storage configuration
+// Storage config
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // folder to store uploaded files
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // folder to store files
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     const uniqueName =
       Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
     cb(null, uniqueName);
   },
 });
 
-// File filter (optional)
+// File filter
 const fileFilter = (req, file, cb) => {
   const allowed = ["image/jpeg", "image/png", "image/jpg", "application/pdf"];
   if (allowed.includes(file.mimetype)) cb(null, true);

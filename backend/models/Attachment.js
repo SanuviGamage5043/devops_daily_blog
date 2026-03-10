@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const attachmentSchema = new mongoose.Schema(
   {
-    entry: { type: mongoose.Schema.Types.ObjectId, ref: "JournalEntry", required: true },
+    entry: { type: mongoose.Schema.Types.ObjectId, ref: "Entry", required: true },
     fileName: { type: String, required: true },
     fileUrl: { type: String, required: true },
     fileType: { type: String, default: "document" },

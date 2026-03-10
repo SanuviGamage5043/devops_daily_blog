@@ -1,5 +1,3 @@
-// utils/validatePassword.js
-
 export const validatePassword = (password) => {
   const rules = [
     { regex: /.{8,}/, message: "Password must be at least 8 characters long" },
@@ -10,10 +8,7 @@ export const validatePassword = (password) => {
   ];
 
   for (const rule of rules) {
-    if (!rule.regex.test(password)) {
-      return rule.message;
-    }
+    if (!rule.regex.test(password)) return rule.message;
   }
-
-  return null; // No errors → valid password
+  return null; // valid
 };

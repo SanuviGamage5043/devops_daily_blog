@@ -7,22 +7,28 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
   const [stats, setStats] = useState([]);
-  const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId");
 
-  // Fetch user entries
+  const token = localStorage.getItem("token");
+
+  // Fetch entries from backend
   useEffect(() => {
     const fetchEntries = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/entries/user`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          "http://65.2.128.22:5000/entries/user",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const data = res.data;
         setEntries(data);
 
-        // Calculate stats
+        // Stats calculation
         const total = data.length;
+
         const moods = data.map((e) => e.mood);
         const mostCommonMood =
           moods.sort(
@@ -61,13 +67,19 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
       <NavBar />
 
-      <main className="max-w-8xl mx-auto px-4 py-10">
+      <main className="max-w-6xl mx-auto px-4 py-10">
+
+        {/* Welcome */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome back!</h2>
-          <p className="text-lg text-gray-500">Continue your journaling journey</p>
+          <h2 className="text-3xl font-bold text-indigo-700">
+            Welcome back 👋
+          </h2>
+          <p className="text-gray-600">
+            Continue your Life Journal journey
+          </p>
         </div>
 
         {/* Stats */}
@@ -75,70 +87,70 @@ const HomePage = () => {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition duration-300"
+              className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition"
             >
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-md text-gray-500">{stat.label}</p>
-                  <p className="text-3xl font-extrabold text-gray-900 mt-1">{stat.value}</p>
+                  <p className="text-gray-500">{stat.label}</p>
+                  <p className="text-3xl font-bold text-indigo-600 mt-1">
+                    {stat.value}
+                  </p>
                 </div>
-                <span className="text-2xl">{stat.icon}</span>
+                <span className="text-3xl">{stat.icon}</span>
               </div>
             </div>
           ))}
         </div>
 
         {/* Actions */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 mb-10">
           {actions.map((action, index) => (
             <button
               key={index}
               onClick={() => navigate(action.path)}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl text-center shadow-md transition duration-200 ease-in-out ${
+              className={`flex flex-col items-center justify-center p-5 rounded-xl shadow-md transition ${
                 action.primary
-                  ? "bg-indigo-600 hover:bg-indigo-700 text-white col-span-2 sm:col-span-1"
-                  : "bg-white hover:bg-gray-100 border border-gray-200 text-gray-700"
+                  ? "bg-indigo-500 hover:bg-indigo-600 text-white"
+                  : "bg-white hover:bg-gray-50"
               }`}
-              style={action.primary ? { minHeight: "100px" } : {}}
             >
-              <span
-                className={`text-2xl mb-1 ${action.primary ? "text-white" : "text-gray-600"}`}
-              >
-                {action.icon}
-              </span>
-              <span className={`font-semibold ${action.primary ? "text-white" : "text-gray-800"}`}>
-                {action.label}
-              </span>
+              <span className="text-2xl mb-1">{action.icon}</span>
+              <span className="font-semibold">{action.label}</span>
             </button>
           ))}
         </div>
 
         {/* Recent Entries */}
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Entries</h3>
+        <h3 className="text-xl font-semibold text-indigo-700 mb-4">
+          Recent Entries
+        </h3>
+
         {entries.length === 0 ? (
-          <p className="text-gray-500">No entries yet. Start journaling!</p>
+          <p className="text-gray-600">
+            No entries yet. Start writing your first journal entry ✍️
+          </p>
         ) : (
           <div className="space-y-4">
             {entries.map((entry) => (
               <div
                 key={entry._id}
-                className="bg-white p-5 rounded-xl border-l-4 border-yellow-500 shadow-md flex justify-between items-start hover:shadow-lg transition duration-200"
+                className="bg-white p-5 rounded-xl shadow-md border-l-4 border-indigo-400"
               >
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900">{entry.title}</h4>
-                  <p className="text-gray-600 my-1">{entry.content}</p>
+                <h4 className="text-lg font-bold text-gray-800">
+                  {entry.title}
+                </h4>
+
+                <p className="text-gray-600 my-2">{entry.content}</p>
+
+                <div className="flex justify-between items-center">
                   <p className="text-sm text-gray-400">
-                    {new Date(entry.createdAt).toLocaleDateString("en-US", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {new Date(entry.createdAt).toLocaleDateString()}
                   </p>
+
+                  <span className="bg-indigo-100 text-indigo-700 px-3 py-1 text-xs rounded-full">
+                    {entry.mood}
+                  </span>
                 </div>
-                <span className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full uppercase self-center">
-                  {entry.mood}
-                </span>
               </div>
             ))}
           </div>
